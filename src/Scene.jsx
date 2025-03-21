@@ -22,9 +22,9 @@ function FloatingIsland() {
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    groupRef.current.position.y = Math.sin(t) * 0.2;
-    state.camera.position.x = Math.sin(t * 0.2) * 2;
-    state.camera.position.z = Math.cos(t * 0.2) * 2;
+    groupRef.current.position.y = Math.sin(t) * 0.3;
+    state.camera.position.x = Math.sin(t * 0.3) * 3;
+    state.camera.position.z = Math.cos(t * 0.3) * 3;
     state.camera.lookAt(0, 0, 0);
   });
 
@@ -56,10 +56,25 @@ function Walls() {
   );
 }
 
+function RotatingSun() {
+  const sunRef = useRef();
+  const materials = useLoader(MTLLoader, '/Starburst_Sun_0321084337_texture.mtl');
+  const obj = useLoader(OBJLoader, '/Starburst_Sun_0321084337_texture.obj', loader => {
+    materials.preload();
+    loader.setMaterials(materials);
+  });
+
+  useFrame(() => {
+    sunRef.current.rotation.z += 0.005;
+  });
+
+  return <primitive ref={sunRef} object={obj} scale={0.3} position={[-2, 1.1, 0]} rotation={[0, Math.PI / 4, 0]} />;
+}
+
 export default function Scene() {
   const floorTexture = useLoader(TextureLoader, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXfAZMOWHDQ3DKE63A9jWhIqQaKcKqUIXvzg&s');
   floorTexture.repeat.set(4, 4);
-  floorTexture.wrapS = floorTexture.wrapT = 1000; // RepeatWrapping
+  floorTexture.wrapS = floorTexture.wrapT = 1000;
 
   return (
     <Canvas shadows camera={{ position: [0, 1, 2], fov: 50 }} style={{ background: 'white' }}>
@@ -80,6 +95,7 @@ export default function Scene() {
       <Suspense fallback={null}>
         <FloatingIsland />
         <Walls />
+        <RotatingSun />
       </Suspense>
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]} receiveShadow>
